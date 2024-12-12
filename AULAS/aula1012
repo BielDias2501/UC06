@@ -1,0 +1,61 @@
+create table if not exists GENERO(
+   ID SERIAL primary key,
+   NOME VARCHAR(50) not null unique
+);
+
+create table if not exists FILME(
+    ID SERIAL primary key,
+    NOME VARCHAR(60) not null,
+    ID_GENERO INT not null,
+    constraint fk_genero foreign key (ID_GENERO) references GENERO(ID)
+);
+
+insert into GENERO (nome)
+values ('Animação'), ('Terror'), ('Ação'), ('Drama'), ('Comédia');
+
+insert into FILME(nome, id_genero)
+values ('Batman',3), ('The Battle of the Dark River',3), ('White Duck',1),
+('Breaking Barriers',4), ('The Two Hours',2);
+
+insert into FILME(nome, id_genero)
+values ('Batman - o retorno',3), ('Moana',7), ('Pato Donald',1), ('Hulk',2), ('Tropa de Elite',6);
+
+insert into GENERO(id, nome)
+values (6,'Documentario'), (7,'Suspense');
+
+select nome from filme where id_genero = (Select id from genero where nome = 'Terror');
+
+select nome from filme where id_genero = (Select id from genero where nome = 'Terror') 
+or id_genero = (Select id from genero where nome = 'Drama');
+
+ALTER TABLE FILME ADD CONSTRAINT nome_filme UNIQUE(nome);
+
+select * from genero;
+select * from filme;
+
+--Questão 09
+SELECT * FROM FILME WHERE nome ILIKE '%T';
+
+--Questão 10
+UPDATE FILME
+    SET id_genero=4
+	WHERE id_genero=3;
+
+UPDATE FILME
+    SET id_genero = (Select id from genero where nome = 'Ação')
+	where id_genero = (Select id from genero where nome = 'Drama');
+
+SELECT * FROM FILME
+
+--Questão 11
+SELECT FILME.NOME AS NOME_DO_FILME , GENERO.NOME AS GENERO FROM FILME, GENERO
+WHERE ID_GENERO = GENERO.ID ORDER BY FILME.NOME;
+
+SELECT FILME.NOME AS FILME_NOME, GENERO.NOME AS GENERO_NOME FROM FILME
+JOIN GENERO ON FILME.ID_GENERO = GENERO.ID ORDER BY FILME.NOME
+
+--Questão 12
+DELETE FROM FILME
+WHERE ID_GENERO = (Select id from genero where nome = 'Ação');
+
+select * from filme
