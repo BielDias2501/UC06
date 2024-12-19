@@ -1,0 +1,85 @@
+CREATE TABLE IF NOT EXISTS autor (
+id serial PRIMARY KEY,
+nome varchar(50) NOT NULL,
+data_nascimento date,
+CONSTRAINT chk_data_nascimento CHECK (data_nascimento <= CURRENT_DATE)
+);
+
+
+CREATE TABLE IF NOT EXISTS livro (
+id serial PRIMARY KEY,
+titulo varchar(60) NOT NULL,
+id_autor integer,
+ano_publicacao int,  --pode serint ou interger
+CONSTRAINT fk_autor_livro FOREIGN KEY (id_autor) REFERENCES autor(id),
+CONSTRAINT chk_ano_publicacao CHECK (ano_publicacao >= 1500 and ano_publicacao <= EXTRACT(YEAR FROM CURRENT_DATE))
+);
+
+CREATE TABLE IF NOT EXISTS usuario (
+id serial PRIMARY KEY,
+nome varchar(50) NOT NULL,
+email varchar(50) UNIQUE,
+data_adesao date,
+CONSTRAINT chk_data_adesao CHECK (data_adesao <= CURRENT_DATE)
+);
+
+CREATE TABLE IF NOT EXISTS emprestimo (
+id serial PRIMARY KEY,
+id_livro int,
+id_usuario integer,
+data_emprestimo date NOT NULL,
+data_devolucao date,
+CONSTRAINT fk_livro FOREIGN KEY (id_livro) REFERENCES livro(id),
+CONSTRAINT fk_usario FOREIGN KEY (id_usuario) REFERENCES usuario(id),
+CONSTRAINT chk_data_entrega CHECK (data_emprestimo <= data_devolucao),
+CONSTRAINT up_livro_emprestimo UNIQUE (id_livro, data_emprestimo)
+
+);
+Insert into autor (nome, data_nascimento)
+Values ('Sérgio', '1965-08-11'), ('Gabriel', '2006-01-25'), ('Ederlinda','1967-05-06'), ('Joao','1977-08-15'),('Lucas','2004-12-30');
+-- SELECT * FROM autor
+
+Insert into livro(titulo,id_autor,ano_publicacao)
+Values ('A volta dos que não foram',1,2000), ('Melhor turma do senac',2,1977), ('O careca',3,1965),('O professor',4,2000),('UFRN',5,2006);
+-- SELECT * FROM livro
+
+Insert into usuario (nome,email,data_adesao)
+Values ('Gabriel','gabriel@gmail.com','2024-12-02'),('Sérgio','sergio@gmail.com','2024-11-28'),('JP','jp@gmail.com','2024-10-23'),('PL','pl@gmail.com','2024-09-20'),('valtemir','valtemir@gmail.com','2024-07-15');
+SELECT * FROM usuario;
+
+Insert into emprestimo (id_livro,id_usuario,data_emprestimo,data_devolucao)
+Values  
+ (1, 1, '2020-01-01', '2020-01-30'),
+ (2, 2, '2021-01-01', '2021-01-30'),
+ (3, 3, '2022-01-01', '2022-01-30'),
+ (4, 4, '2023-01-01', '2023-01-30'),
+ (5, 5, '2024-01-01', '2024-01-30');
+SELECT * FROM emprestimo
+
+select livro.titulo, autor.nome from
+autor
+join livro on livro.id_autor = autor.id;
+
+--QUESTÃO 2
+select nome,email from 
+usuario;
+
+--QUESTÃO 3
+select usuario.nome, livro.titulo, emprestimo.data_emprestimo, emprestimo.data_devolucao
+from emprestimo
+join livro on id_livro = livro.id
+join usuario on id_usuario = usuario.id;
+
+--QUESTÃO 4
+select livro.titulo, emprestimo.data_devolucao
+from emprestimo
+join livro on id_livro = livro.id
+where data_devolucao = null
+
+--QUESTÃO 5
+select usuario.nome, livro.titulo, autor.nome
+from emprestimo
+join livro on id_livro = livro.id
+join usuario on id_usuario = usuario.id
+join autor on id_autor = autor.id
+where autor.nome = 'Sérgio';
